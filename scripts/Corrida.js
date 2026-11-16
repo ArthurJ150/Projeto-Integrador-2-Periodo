@@ -1,12 +1,14 @@
+import { Atleta } from "./Atleta.js";
+
 export class Corrida {
     #nome;
     #local;
     #data;
     #distancia;
     #capacidade;
-    #participantes = [];
+    #participantes;
 
-    constructor(nome, local, data, distancia, capacidade, participantes = []) {
+    constructor(nome, local, data, distancia, capacidade) {
         this.#nome = nome;
         this.#local = local;
         this.#data = data;
@@ -16,9 +18,7 @@ export class Corrida {
         if (capacidade > 0) {
             this.#capacidade = capacidade;
         }
-        if (participantes instanceof Atleta) {
-            this.#participantes.push(participantes);
-        }
+        this.#participantes = [];
     }
 
     get nome() {
@@ -91,10 +91,10 @@ export class Corrida {
     }
 
     toString() {
-        return `Corrida: ${this.#nome};
-        \nLocal: ${this.#local};
-        \nData: ${this.#data};
-        \nDistância: ${this.#distancia} km;
-        \nCapacidade: ${this.#capacidade} participantes.`;
+        return `Corrida: ${this.#nome}
+        \nLocal: ${this.#local}
+        \nData: ${this.#data}
+        \nDistância: ${this.#distancia} km
+        \nCapacidade: ${this.#capacidade} participantes`;
     }
 }
