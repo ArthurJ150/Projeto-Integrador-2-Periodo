@@ -95,6 +95,7 @@ export class Corrida {
         \nLocal: ${this.#local}
         \nData: ${this.#data}
         \nDistância: ${this.#distancia} km
-        \nCapacidade: ${this.#capacidade} participantes`;
+        \nCapacidade: ${this.#capacidade} participantes
+        \nParticipantes: ${this.#participantes.map((atleta) => atleta.nome).join(", ")}`;
     }
 }
