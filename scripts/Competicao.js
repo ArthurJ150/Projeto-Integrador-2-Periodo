@@ -1,6 +1,6 @@
 import { Atleta } from "./Atleta.js";
 
-export class Corrida {
+export class Competicao {
     #nome;
     #local;
     #data;

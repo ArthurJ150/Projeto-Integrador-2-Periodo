@@ -1,6 +1,6 @@
-import { Corrida } from "./Corrida.js";
+import { Competicao } from "./Competicao.js";
 
-export class Maratona extends Corrida {
+export class Maratona extends Competicao {
     #altimetria;
     #percursoUrbano;
 
