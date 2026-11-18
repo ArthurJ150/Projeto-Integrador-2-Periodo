@@ -2,7 +2,7 @@ import { Atleta } from "./Atleta.js";
 import { Maratona } from "./Maratona.js";
 import { TrailRunning } from "./TrailRunning.js";
 
-export class CorridaController {
+export class CompeticaoController {
     #vetCompeticoes;
     #vetAtletas;
 
@@ -44,6 +44,15 @@ export class CorridaController {
         if (competicao === undefined) {
             this.#vetCompeticoes.push(new TrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa));
             return true;
+        }
+        return false;
+    }
+
+    cadastrarAtletaEmCompeticao(nomeCompeticao, docIdentidade) {
+        let competicao = this.consultarCompeticao(nomeCompeticao);
+        let atleta = this.consultarAtleta(docIdentidade);
+        if (competicao !== undefined && atleta !== undefined) {
+            return competicao.adicionarParticipante(atleta);
         }
         return false;
     }
