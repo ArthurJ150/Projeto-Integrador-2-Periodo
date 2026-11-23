@@ -73,10 +73,74 @@ export class CompeticaoController {
         return false;
     }
 
+    editarMaratona(nome, local, data, distancia, capacidade, altimetria, percursoUrbano) {
+        let competicao = this.consultarCompeticao(nome);
+        if (competicao !== undefined && competicao instanceof Maratona) {
+            if (nome !== "" || nome !== competicao.nome) {
+                competicao.nome = nome;
+            }
+            if (local !== "" || local !== competicao.local) {
+                competicao.local = local;
+            }
+            if (data !== "" || data !== competicao.data) {
+                competicao.data = data;
+            }
+            if (distancia !== "" || distancia !== competicao.distancia) {
+                competicao.distancia = distancia;
+            }
+            if (capacidade !== "" || capacidade !== competicao.capacidade) {
+                competicao.capacidade = capacidade;
+            }
+            if (altimetria !== "" || altimetria !== competicao.altimetria) {
+                competicao.altimetria = altimetria;
+            }
+            if (percursoUrbano !== "" || percursoUrbano !== competicao.percursoUrbano) {
+                competicao.percursoUrbano = percursoUrbano;
+            }
+            return true;
+        }
+        return false;
+    }
+
     cadastrarTrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa) {
         let competicao = this.consultarCompeticao(nome);
         if (competicao === undefined) {
             this.#vetCompeticoes.push(new TrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa));
+            return true;
+        }
+        return false;
+    }
+
+    editarTrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa) {
+        let competicao = this.consultarCompeticao(nome);
+        if (competicao !== undefined && competicao instanceof TrailRunning) {
+            if (nome !== "" || nome !== competicao.nome) {
+                competicao.nome = nome;
+            }
+            if (local !== "" || local !== competicao.local) {
+                competicao.local = local;
+            }
+            if (data !== "" || data !== competicao.data) {
+                competicao.data = data;
+            }
+            if (distancia !== "" || distancia !== competicao.distancia) {
+                competicao.distancia = distancia;
+            }
+            if (capacidade !== "" || capacidade !== competicao.capacidade) {
+                competicao.capacidade = capacidade;
+            }
+            if (tipoTerreno !== "" || tipoTerreno !== competicao.tipoTerreno) {
+                competicao.tipoTerreno = tipoTerreno;
+            }
+            if (nivelDificuldade !== "" || nivelDificuldade !== competicao.nivelDificuldade) {
+                competicao.nivelDificuldade = nivelDificuldade;
+            }
+            if (checkpoints !== "" || checkpoints !== competicao.checkpoints) {
+                competicao.checkpoints = checkpoints;
+            }
+            if (tipoDisputa !== "" || tipoDisputa !== competicao.tipoDisputa) {
+                competicao.tipoDisputa = tipoDisputa;
+            }
             return true;
         }
         return false;

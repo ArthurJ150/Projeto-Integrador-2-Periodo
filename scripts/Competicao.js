@@ -71,7 +71,7 @@ export class Competicao {
 
     adicionarParticipante(atleta) {
         if (this.#participantes.length < this.#capacidade) {
-            if (atleta instanceof Atleta) {
+            if (atleta instanceof Atleta && atleta.habilitado) {
                 this.#participantes.push(atleta);
                 return true;
             }
