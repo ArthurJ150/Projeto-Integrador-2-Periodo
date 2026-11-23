@@ -4,6 +4,7 @@ export class Atleta {
     #nacionalidade;
     #modalidade = [];
     #docIdentidade;
+    #habilitado = true;
 
     constructor(nome, dataNascimento, nacionalidade, modalidade = [], docIdentidade) {
         this.#nome = nome;
@@ -33,6 +34,10 @@ export class Atleta {
         return this.#docIdentidade;
     }
 
+    get habilitado() {
+        return this.#habilitado;
+    }
+
     set nome(nome) {
         this.#nome = nome;
     }
@@ -43,6 +48,10 @@ export class Atleta {
 
     set nacionalidade(nacionalidade) {
         this.#nacionalidade = nacionalidade;
+    }
+
+    set habilitado(habilitado) {
+        this.#habilitado = habilitado;
     }
 
     adicionarModalidade(modalidade) {

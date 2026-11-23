@@ -16,13 +16,47 @@ export class CompeticaoController {
         return this.#vetAtletas.find(atleta => atleta.docIdentidade === docIdentidade);
     }
 
-    cadastrarAtletla(nome, dataNascimento, nacionalidade, modalidade, docIdentidade) {
+    cadastrarAtleta(nome, dataNascimento, nacionalidade, modalidade, docIdentidade) {
         let atleta = this.consultarAtleta(docIdentidade);
         if (atleta === undefined) {
             this.#vetAtletas.push(new Atleta(nome, dataNascimento, nacionalidade, modalidade, docIdentidade));
             return true;
         }
         return false;
+    }
+
+    atualizarAtleta(docIdentidade, nome, dataNascimento, nacionalidade, modalidade) {
+        let atleta = this.consultarAtleta(docIdentidade);
+        if (atleta !== undefined) {
+            if(nome !== "" || nome !== atleta.nome) {
+                atleta.nome = nome;
+            }
+            if(dataNascimento !== "" || dataNascimento !== atleta.dataNascimento) {
+                atleta.dataNascimento = dataNascimento;
+            }
+            if(nacionalidade !== "" || nacionalidade !== atleta.nacionalidade) {
+                atleta.nacionalidade = nacionalidade;
+            }
+            if(modalidade !== "") {
+                atleta.adicionarModalidade(modalidade);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    excluirAtleta(docIdentidade) {
+        let atleta = this.consultarAtleta(docIdentidade);
+        let competicoes = this.#vetCompeticoes.filter(competicao => competicao.participantes.includes(atleta));
+        if (atleta !== undefined) {
+            const index = this.#vetAtletas.indexOf(atleta);
+            this.#vetAtletas.splice(index, 1);
+            if (competicoes.length > 0) {
+                atleta.habilitado = false;
+            }
+            return true;
+        }
+        return false;   
     }
 
     // ---------- Métodos para Competições ----------
