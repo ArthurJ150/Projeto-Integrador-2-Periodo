@@ -102,6 +102,16 @@ export class CompeticaoController {
         return false;
     }
 
+    deletarMaratona(nome) {
+        let competicao = this.consultarCompeticao(nome);
+        if (competicao !== undefined && competicao instanceof Maratona) {
+            const index = this.#vetCompeticoes.indexOf(competicao);
+            this.#vetCompeticoes.splice(index, 1);
+            return true;
+        }
+        return false;
+    }
+
     cadastrarTrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa) {
         let competicao = this.consultarCompeticao(nome);
         if (competicao === undefined) {
@@ -141,6 +151,16 @@ export class CompeticaoController {
             if (tipoDisputa !== "" || tipoDisputa !== competicao.tipoDisputa) {
                 competicao.tipoDisputa = tipoDisputa;
             }
+            return true;
+        }
+        return false;
+    }
+
+    deletarTrailRunning(nome) {
+        let competicao = this.consultarCompeticao(nome);
+        if (competicao !== undefined && competicao instanceof TrailRunning) {
+            const index = this.#vetCompeticoes.indexOf(competicao);
+            this.#vetCompeticoes.splice(index, 1);
             return true;
         }
         return false;
