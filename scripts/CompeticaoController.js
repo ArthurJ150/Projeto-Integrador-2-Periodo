@@ -46,14 +46,12 @@ export class CompeticaoController {
     }
 
     excluirAtleta(docIdentidade) {
+        //IMPORTANTE: a função de exlcuir um atleta não o remove do sistema, apenas muda seu status para desabilitado
+        // Isso é feito para manter o histórico de participações do atleta em competições
+        // Atletas desabilitados não serão mostrados nas listagens e não poderão ser inscritos em novas competições
         let atleta = this.consultarAtleta(docIdentidade);
-        let competicoes = this.#vetCompeticoes.filter(competicao => competicao.participantes.includes(atleta));
         if (atleta !== undefined) {
-            const index = this.#vetAtletas.indexOf(atleta);
-            this.#vetAtletas.splice(index, 1);
-            if (competicoes.length > 0) {
-                atleta.habilitado = false;
-            }
+            atleta.habilitado = false;
             return true;
         }
         return false;   
