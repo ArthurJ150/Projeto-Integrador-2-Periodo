@@ -63,10 +63,9 @@ export class CompeticaoController {
             if(atleta.habilitado){
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    dataNascimento: atleta.dataNascimento,
+                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
                     nacionalidade: atleta.nacionalidade,
-                    modalidade: atleta.modalidade,
-                    docIdentidade: atleta.docIdentidade
+                    modalidade: atleta.modalidade
                 });
             }
         });
@@ -79,10 +78,9 @@ export class CompeticaoController {
             if(atleta.habilitado && atleta.modalidade.includes(modalidade)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    dataNascimento: atleta.dataNascimento,
+                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
                     nacionalidade: atleta.nacionalidade,
-                    modalidade: atleta.modalidade,
-                    docIdentidade: atleta.docIdentidade
+                    modalidade: atleta.modalidade
                 });
             }
         });
@@ -95,14 +93,32 @@ export class CompeticaoController {
             if(atleta.habilitado && atleta.nome.includes(nome)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    dataNascimento: atleta.dataNascimento,
+                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
                     nacionalidade: atleta.nacionalidade,
-                    modalidade: atleta.modalidade,
-                    docIdentidade: atleta.docIdentidade
+                    modalidade: atleta.modalidade
                 });
             }
         });
         return vetObjLiteraisAtletals;
+    }
+
+    mostrarCompeticoesParticipadasPorAtleta(docIdentidade) {
+        let atleta = this.consultarAtleta(docIdentidade);
+        if (atleta !== undefined) {
+            var vetObjLiteraisCompeticoes = [];
+            this.#vetCompeticoes.forEach(competicao => {
+                if (competicao.participantes.includes(atleta)) {
+                    vetObjLiteraisCompeticoes.push({
+                        nome: competicao.nome,
+                        data: competicao.data,
+                        local: competicao.local,
+                        modalidade: competicao instanceof Maratona ? "Maratona" : "Trail Running"
+                    });
+                }
+            });
+            return vetObjLiteraisCompeticoes;
+        }
+        return [];
     }
 
     // ---------- Métodos para Competições ----------
@@ -143,16 +159,6 @@ export class CompeticaoController {
             if (percursoUrbano !== "" || percursoUrbano !== competicao.percursoUrbano) {
                 competicao.percursoUrbano = percursoUrbano;
             }
-            return true;
-        }
-        return false;
-    }
-
-    deletarMaratona(nome) {
-        let competicao = this.consultarCompeticao(nome);
-        if (competicao !== undefined && competicao instanceof Maratona) {
-            const index = this.#vetCompeticoes.indexOf(competicao);
-            this.#vetCompeticoes.splice(index, 1);
             return true;
         }
         return false;
@@ -202,9 +208,9 @@ export class CompeticaoController {
         return false;
     }
 
-    deletarTrailRunning(nome) {
+    deletarCompeticao(nome) {
         let competicao = this.consultarCompeticao(nome);
-        if (competicao !== undefined && competicao instanceof TrailRunning) {
+        if (competicao !== undefined) {
             const index = this.#vetCompeticoes.indexOf(competicao);
             this.#vetCompeticoes.splice(index, 1);
             return true;
