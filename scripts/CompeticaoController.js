@@ -73,6 +73,38 @@ export class CompeticaoController {
         return vetObjLiteraisAtletals;
     }
 
+    filtrarAtletasPorModalidade(modalidade) {
+        var vetObjLiteraisAtletals = [];
+        this.#vetAtletas.forEach(atleta => {
+            if(atleta.habilitado && atleta.modalidade.includes(modalidade)) {
+                vetObjLiteraisAtletals.push({
+                    nome: atleta.nome,
+                    dataNascimento: atleta.dataNascimento,
+                    nacionalidade: atleta.nacionalidade,
+                    modalidade: atleta.modalidade,
+                    docIdentidade: atleta.docIdentidade
+                });
+            }
+        });
+        return vetObjLiteraisAtletals;
+    }
+
+    filtrarAtletasPorNome(nome) {
+        var vetObjLiteraisAtletals = [];
+        this.#vetAtletas.forEach(atleta => {
+            if(atleta.habilitado && atleta.nome.includes(nome)) {
+                vetObjLiteraisAtletals.push({
+                    nome: atleta.nome,
+                    dataNascimento: atleta.dataNascimento,
+                    nacionalidade: atleta.nacionalidade,
+                    modalidade: atleta.modalidade,
+                    docIdentidade: atleta.docIdentidade
+                });
+            }
+        });
+        return vetObjLiteraisAtletals;
+    }
+
     // ---------- Métodos para Competições ----------
     consultarCompeticao(nome) {
         return this.#vetCompeticoes.find(competicao => competicao.nome === nome);
