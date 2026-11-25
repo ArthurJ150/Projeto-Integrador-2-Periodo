@@ -220,4 +220,56 @@ export class CompeticaoController {
         }
         return false;
     }
+
+    filtrarCompeticoesPorModalidade(modalidade) {
+        var vetObjLiteraisCompeticoes = [];
+        this.#vetCompeticoes.forEach(competicao => {
+            if (competicao instanceof Maratona && modalidade === "Maratona") {
+                vetObjLiteraisCompeticoes.push({
+                    nome: competicao.nome,
+                    local: competicao.local,
+                    data: competicao.data,
+                    distancia: competicao.distancia,
+                    capacidade: competicao.capacidade,
+                    tipoTerreno: competicao.tipoTerreno,
+                    nivelDificuldade: competicao.nivelDificuldade,
+                    checkpoints: competicao.checkpoints,
+                    tipoDisputa: competicao.tipoDisputa
+                });
+            } else if (competicao instanceof TrailRunning && modalidade === "Trail Running") {
+                vetObjLiteraisCompeticoes.push({
+                    nome: competicao.nome,
+                    local: competicao.local,
+                    data: competicao.data,
+                    distancia: competicao.distancia,
+                    capacidade: competicao.capacidade,
+                    tipoTerreno: competicao.tipoTerreno,
+                    nivelDificuldade: competicao.nivelDificuldade,
+                    checkpoints: competicao.checkpoints,
+                    tipoDisputa: competicao.tipoDisputa
+                });
+            }
+        });
+        return vetObjLiteraisCompeticoes;
+    }
+
+    filtrarCompeticoesPorNome(nome) {
+        var vetObjLiteraisCompeticoes = [];
+        this.#vetCompeticoes.forEach(competicao => {
+            if (competicao.nome.includes(nome)) {
+                vetObjLiteraisCompeticoes.push({
+                    nome: competicao.nome,
+                    local: competicao.local,
+                    data: competicao.data,
+                    distancia: competicao.distancia,
+                    capacidade: competicao.capacidade,
+                    tipoTerreno: competicao.tipoTerreno,
+                    nivelDificuldade: competicao.nivelDificuldade,
+                    checkpoints: competicao.checkpoints,
+                    tipoDisputa: competicao.tipoDisputa
+                });
+            }
+        });
+        return vetObjLiteraisCompeticoes;
+    }
 }
