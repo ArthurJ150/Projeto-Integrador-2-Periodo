@@ -237,10 +237,7 @@ export class CompeticaoController {
                     data: competicao.data,
                     distancia: competicao.distancia,
                     capacidade: competicao.capacidade,
-                    tipoTerreno: competicao.tipoTerreno,
-                    nivelDificuldade: competicao.nivelDificuldade,
-                    checkpoints: competicao.checkpoints,
-                    tipoDisputa: competicao.tipoDisputa
+                    modalidade: competicao instanceof Maratona ? "Maratona" : "Trail Running"
                 });
             } else if (competicao instanceof TrailRunning && modalidade === "Trail Running") {
                 vetObjLiteraisCompeticoes.push({
@@ -249,10 +246,7 @@ export class CompeticaoController {
                     data: competicao.data,
                     distancia: competicao.distancia,
                     capacidade: competicao.capacidade,
-                    tipoTerreno: competicao.tipoTerreno,
-                    nivelDificuldade: competicao.nivelDificuldade,
-                    checkpoints: competicao.checkpoints,
-                    tipoDisputa: competicao.tipoDisputa
+                    modalidade: competicao instanceof Maratona ? "Maratona" : "Trail Running"
                 });
             }
         });
@@ -269,10 +263,7 @@ export class CompeticaoController {
                     data: competicao.data,
                     distancia: competicao.distancia,
                     capacidade: competicao.capacidade,
-                    tipoTerreno: competicao.tipoTerreno,
-                    nivelDificuldade: competicao.nivelDificuldade,
-                    checkpoints: competicao.checkpoints,
-                    tipoDisputa: competicao.tipoDisputa
+                    modalidade: competicao instanceof Maratona ? "Maratona" : "Trail Running"
                 });
             }
         });
