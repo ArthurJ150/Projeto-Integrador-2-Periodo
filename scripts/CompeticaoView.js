@@ -12,6 +12,7 @@ const cards = document.getElementById("cards");
 const modeloCard = document.getElementById("modeloCard");
 const btnAdicionar = document.getElementById("btnAdicionar");
 const cardAdicionar = document.getElementById("cardAdicionar");
+const textoCardAdicionar = document.getElementById("textoCardAdicionar");
 const semResultados = document.getElementById("semResultados");
 const sucessoCadastro = document.getElementById("sucessoCadastro");
 
@@ -55,7 +56,10 @@ const erroCadastroAtleta = document.getElementById("erroCadastroAtleta");
 const prefixoAtletas = "gestaoCompeticoes.atleta.";
 const cadastrosLidos = {};
 
-export function criarCardsCompeticao(aoGerenciar) {
+let gerenciarCompeticao;
+
+function criarCardsCompeticao(aoGerenciar = gerenciarCompeticao) {
+    gerenciarCompeticao = aoGerenciar;
     const listaCompeticoes = controller.filtrarCompeticoesPorNome("");
     const fragmento = document.createDocumentFragment();
 
@@ -90,4 +94,49 @@ export function criarCardsCompeticao(aoGerenciar) {
     semResultados.hidden = listaCompeticoes.length > 0;
 }
 
-criarCardsCompeticao();
+function mostrarAba(aba) {
+    const botoes = Array.from(abas);
+    if (!botoes.some(botao => botao.dataset.aba === aba)) {
+        return;
+    }
+
+    for (const botao of botoes) {
+        botao.setAttribute("aria-pressed", String(botao.dataset.aba === aba));
+    }
+
+    const mostrarRelatorio = aba === "relatorio";
+    lista.hidden = mostrarRelatorio;
+    relatorio.hidden = !mostrarRelatorio;
+    sucessoCadastro.hidden = true;
+
+    if (mostrarRelatorio) {
+        return;
+    }
+
+    const mostrarAtletas = aba === "atletas";
+    const rotuloAdicionar = mostrarAtletas ? "Adicionar Atleta" : "Adicionar Competição";
+    const busca = mostrarAtletas ? "Buscar atleta" : "Buscar competição";
+
+    lista.setAttribute("aria-label", mostrarAtletas ? "Atletas" : "Competições");
+    inPesquisa.value = "";
+    inPesquisa.placeholder = busca + "...";
+    inPesquisa.setAttribute("aria-label", busca);
+    slModalidades.options.length = 1;
+    slModalidades.value = "";
+    btnAdicionar.textContent = "+ " + rotuloAdicionar;
+    textoCardAdicionar.textContent = rotuloAdicionar;
+
+    if (mostrarAtletas) {
+        cards.replaceChildren(cardAdicionar);
+        semResultados.textContent = "Nenhum atleta para exibir.";
+        semResultados.hidden = false;
+    } else {
+        criarCardsCompeticao();
+    }
+}
+
+for (const botao of abas) {
+    botao.addEventListener("click", () => mostrarAba(botao.dataset.aba));
+}
+
+mostrarAba("competicoes");
