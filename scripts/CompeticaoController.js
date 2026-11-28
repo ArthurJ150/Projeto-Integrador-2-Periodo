@@ -63,6 +63,19 @@ export class CompeticaoController {
         return false;
     }
 
+    calcularIdade(dataNascimento) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dataNascimento)) {
+            return null;
+        }
+
+        const [ano, mes, dia] = dataNascimento.split("-").map(Number);
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth() + 1;
+        const aniversarioPendente = mesAtual < mes ||
+            (mesAtual === mes && hoje.getDate() < dia);
+        return hoje.getFullYear() - ano - Number(aniversarioPendente);
+    }
+
     listarAtletas() {
         var vetObjLiteraisAtletals = [];
         this.#vetAtletas.forEach(atleta => {

@@ -94,6 +94,38 @@ function criarCardsCompeticao(aoGerenciar = gerenciarCompeticao) {
     semResultados.hidden = listaCompeticoes.length > 0;
 }
 
+function criarCardsAtletas() {
+    const atletas = controller.listarAtletas();
+    const fragmento = document.createDocumentFragment();
+
+    for (const atleta of atletas) {
+        const card = modeloCard.content.firstElementChild.cloneNode(true);
+        const nomes = atleta.nome.trim().split(/\s+/);
+        const iniciais = card.querySelector(".card-iniciais");
+        const modalidades = atleta.modalidade.flat().filter(Boolean);
+        const idade = Number.isFinite(atleta.idade) && atleta.idade >= 0
+            ? `${atleta.idade} ${atleta.idade === 1 ? "ano" : "anos"}`
+            : "não informada";
+
+        card.classList.add("card-atleta");
+        iniciais.textContent = (nomes[0].charAt(0) +
+            (nomes.length > 1 ? nomes.at(-1).charAt(0) : "")).toUpperCase();
+        iniciais.hidden = false;
+
+        card.querySelector("h2").textContent = atleta.nome;
+        card.querySelector(".card-etiqueta").textContent = modalidades.join(", ") || "Sem modalidade";
+        card.querySelector(".card-primeira-info").textContent = `Idade: ${idade}`;
+        card.querySelector(".card-segunda-info").textContent = `Nacionalidade: ${atleta.nacionalidade}`;
+        card.querySelector(".card-resumo").hidden = true;
+        card.querySelector(".card-rodape").hidden = true;
+        fragmento.appendChild(card);
+    }
+
+    cards.replaceChildren(fragmento, cardAdicionar);
+    semResultados.textContent = "Nenhum atleta para exibir.";
+    semResultados.hidden = atletas.length > 0;
+}
+
 function mostrarAba(aba) {
     const botoes = Array.from(abas);
     if (!botoes.some(botao => botao.dataset.aba === aba)) {
@@ -127,9 +159,7 @@ function mostrarAba(aba) {
     textoCardAdicionar.textContent = rotuloAdicionar;
 
     if (mostrarAtletas) {
-        cards.replaceChildren(cardAdicionar);
-        semResultados.textContent = "Nenhum atleta para exibir.";
-        semResultados.hidden = false;
+        criarCardsAtletas();
     } else {
         criarCardsCompeticao();
     }
