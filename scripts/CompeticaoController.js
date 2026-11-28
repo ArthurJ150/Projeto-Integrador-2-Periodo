@@ -66,7 +66,7 @@ export class CompeticaoController {
             if (atleta.habilitado) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
+                    idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
                 });
@@ -81,7 +81,7 @@ export class CompeticaoController {
             if (atleta.habilitado && atleta.modalidade.includes(modalidade)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
+                    idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
                 });
@@ -96,7 +96,7 @@ export class CompeticaoController {
             if (atleta.habilitado && atleta.nome.includes(nome)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
+                    idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
                 });
