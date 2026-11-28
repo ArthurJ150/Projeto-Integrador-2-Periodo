@@ -57,13 +57,30 @@ export class CompeticaoController {
         return false;   
     }
 
+    calcularIdade(dataNascimento) {
+        const partes = dataNascimento.split("-");
+        const anoNascimento = Number(partes[0]);
+        const mesNascimento = Number(partes[1]);
+        const diaNascimento = Number(partes[2]);
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth() + 1;
+        let idade = hoje.getFullYear() - anoNascimento;
+
+        // Desconta um ano se o aniversário deste ano ainda não chegou.
+        if (mesAtual < mesNascimento || (mesAtual === mesNascimento && hoje.getDate() < diaNascimento)) {
+            idade--;
+        }
+
+        return idade;
+    }
+
     listarAtletas(){
         var vetObjLiteraisAtletals = [];
         this.#vetAtletas.forEach(atleta => {
             if(atleta.habilitado){
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
+                    idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
                 });
@@ -78,7 +95,7 @@ export class CompeticaoController {
             if(atleta.habilitado && atleta.modalidade.includes(modalidade)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
+                    idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
                 });
@@ -93,7 +110,7 @@ export class CompeticaoController {
             if(atleta.habilitado && atleta.nome.includes(nome)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
-                    idade: new Date().getFullYear() - new Date(atleta.dataNascimento).getFullYear(),
+                    idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
                 });
