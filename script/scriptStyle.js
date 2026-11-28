@@ -65,8 +65,20 @@ const mensagemPerfil = document.getElementById("mensagemPerfil");
 const btnEditarCompeticao = document.getElementById("editarCompeticao");
 const btnInscrever = document.getElementById("btnInscrever");
 const avisoInscricao = document.getElementById("avisoInscricao");
+const modalInscricao = document.getElementById("modalInscricao");
 const formInscricao = document.getElementById("formInscricao");
-const atletaInscricao = document.getElementById("atletaInscricao");
+const buscaAtletaInscricao = document.getElementById("buscaAtletaInscricao");
+const resultadosAtletaInscricao = document.getElementById("resultadosAtletaInscricao");
+const mensagemBuscaAtleta = document.getElementById("mensagemBuscaAtleta");
+const confirmarInscricao = document.getElementById("confirmarInscricao");
+const opcaoAtletaCadastrado = document.getElementById("opcaoAtletaCadastrado");
+const opcaoNovoAtleta = document.getElementById("opcaoNovoAtleta");
+const formNovoInscrito = document.getElementById("formNovoInscrito");
+const nomeNovoInscrito = document.getElementById("nomeNovoInscrito");
+const nascimentoNovoInscrito = document.getElementById("nascimentoNovoInscrito");
+const paisNovoInscrito = document.getElementById("paisNovoInscrito");
+const modalidadeNovoInscrito = document.getElementById("modalidadeNovoInscrito");
+const erroInscricao = document.getElementById("erroInscricao");
 const pesquisaInscritos = document.getElementById("pesquisaInscritos");
 const linhasInscritos = document.getElementById("linhasInscritos");
 const modeloInscrito = document.getElementById("modeloInscrito");
@@ -97,12 +109,14 @@ const paisAtleta = document.getElementById("paisAtleta");
 const modalidadeAtleta = document.getElementById("modalidadeAtleta");
 const erroCadastroAtleta = document.getElementById("erroCadastroAtleta");
 const prefixoAtletas = "gestaoCompeticoes.atleta.";
+const chaveCadastros = "gestaoCompeticoes.registros";
 const cadastrosLidos = {};
 
 let abaAtual;
 let botaoQueAbriuCadastro;
 let competicaoAberta = null;
 let atletaAberto = null;
+let idAtletaSelecionado = "";
 
 function normalizar(texto) {
     // Separa os acentos das letras para que a busca possa ignorá-los.
@@ -453,37 +467,93 @@ function mostrarInscritos() {
 }
 
 function fecharInscricao() {
-    formInscricao.hidden = true;
-    btnInscrever.setAttribute("aria-expanded", "false");
-    atletaInscricao.value = "";
+    if (modalInscricao.open) {
+        modalInscricao.close();
+    }
 }
 
 function atualizarOpcoesInscricao(vagas) {
-    atletaInscricao.options.length = 1;
-    atletaInscricao.value = "";
-
+    buscaAtletaInscricao.disabled = true;
     for (let i = 0; i < atletas.length; i++) {
-        const atleta = atletas[i];
-        if (!competicaoAberta.idsInscritos.includes(atleta.id)) {
-            const opcao = document.createElement("option");
-            opcao.value = atleta.id;
-            opcao.textContent = atleta.nome + " · " + atleta.modalidade;
-            atletaInscricao.appendChild(opcao);
+        if (!competicaoAberta.idsInscritos.includes(atletas[i].id)) {
+            buscaAtletaInscricao.disabled = false;
+            break;
         }
     }
 
-    avisoInscricao.textContent = "";
-    if (vagas === 0) {
-        avisoInscricao.textContent = "Todas as vagas estão ocupadas.";
-    } else if (atletas.length === 0) {
-        avisoInscricao.textContent = "Cadastre um atleta para fazer uma inscrição.";
-    } else if (atletaInscricao.options.length === 1) {
-        avisoInscricao.textContent = "Todos os atletas cadastrados já estão inscritos.";
-    }
-    btnInscrever.disabled = avisoInscricao.textContent !== "";
+    btnInscrever.disabled = vagas <= 0;
+    avisoInscricao.textContent = "Todas as vagas estão ocupadas.";
     avisoInscricao.hidden = !btnInscrever.disabled;
     if (btnInscrever.disabled) {
         fecharInscricao();
+    }
+}
+
+function criarResultadoAtletaInscricao(atleta) {
+    const resultado = document.createElement("li");
+    resultado.className = "resultado-atleta-inscricao";
+    const botao = document.createElement("button");
+    botao.type = "button";
+    const nome = document.createElement("strong");
+    nome.textContent = atleta.nome;
+    const detalhes = document.createElement("span");
+    detalhes.textContent = atleta.modalidade + " · " + atleta.nacionalidade + " · " + textoIdade(atleta);
+    botao.appendChild(nome);
+    botao.appendChild(detalhes);
+    resultado.appendChild(botao);
+
+    botao.addEventListener("click", function () {
+        idAtletaSelecionado = atleta.id;
+        buscaAtletaInscricao.value = atleta.nome;
+        resultadosAtletaInscricao.hidden = true;
+        mensagemBuscaAtleta.textContent = "Atleta selecionado · " + detalhes.textContent;
+        confirmarInscricao.disabled = false;
+        confirmarInscricao.focus();
+    });
+
+    return resultado;
+}
+
+function buscarAtletasParaInscricao() {
+    // Uma nova busca exige que o usuário selecione o atleta novamente.
+    idAtletaSelecionado = "";
+    confirmarInscricao.disabled = true;
+    erroInscricao.textContent = "";
+    resultadosAtletaInscricao.textContent = "";
+    resultadosAtletaInscricao.hidden = true;
+    mensagemBuscaAtleta.textContent = "";
+
+    if (buscaAtletaInscricao.disabled) {
+        mensagemBuscaAtleta.textContent = "Nenhum atleta disponível. Use Novo Atleta para cadastrar alguém.";
+        return;
+    }
+
+    const busca = normalizar(buscaAtletaInscricao.value.trim());
+    if (busca === "") {
+        return;
+    }
+
+    const limite = 20;
+    let encontrados = 0;
+    for (let i = 0; i < atletas.length; i++) {
+        const atleta = atletas[i];
+        if (!competicaoAberta.idsInscritos.includes(atleta.id) && normalizar(atleta.nome).includes(busca)) {
+            encontrados++;
+            if (encontrados <= limite) {
+                resultadosAtletaInscricao.appendChild(criarResultadoAtletaInscricao(atleta));
+            }
+        }
+    }
+
+    resultadosAtletaInscricao.hidden = encontrados === 0;
+    if (encontrados === 0) {
+        mensagemBuscaAtleta.textContent = "Nenhum atleta disponível com esse nome.";
+    } else if (encontrados > limite) {
+        mensagemBuscaAtleta.textContent = "Mostrando " + limite + " de " + encontrados + " atletas. Digite mais letras para refinar a busca.";
+    } else if (encontrados === 1) {
+        mensagemBuscaAtleta.textContent = "1 atleta encontrado.";
+    } else {
+        mensagemBuscaAtleta.textContent = encontrados + " atletas encontrados.";
     }
 }
 
@@ -530,24 +600,46 @@ function voltarDoPerfil() {
     }
 }
 
-function alternarInscricao() {
-    if (formInscricao.hidden) {
-        formInscricao.hidden = false;
-        btnInscrever.setAttribute("aria-expanded", "true");
-        atletaInscricao.focus();
-    } else {
-        fecharInscricao();
-        btnInscrever.focus();
+function mostrarOpcaoInscricao(novoAtleta) {
+    formInscricao.hidden = novoAtleta;
+    formNovoInscrito.hidden = !novoAtleta;
+    opcaoAtletaCadastrado.setAttribute("aria-pressed", !novoAtleta);
+    opcaoNovoAtleta.setAttribute("aria-pressed", novoAtleta);
+    erroInscricao.textContent = "";
+
+    if (novoAtleta) {
+        nomeNovoInscrito.focus();
+    } else if (!buscaAtletaInscricao.disabled) {
+        buscaAtletaInscricao.focus();
     }
 }
 
-function salvarInscritos(novosInscritos) {
+function abrirInscricao() {
+    formInscricao.reset();
+    formNovoInscrito.reset();
+    limitarNascimento(nascimentoNovoInscrito);
+    buscarAtletasParaInscricao();
+    mostrarOpcaoInscricao(false);
+    modalInscricao.showModal();
+}
+
+function salvarInscritos(novosInscritos, novoAtleta = null) {
     const inscritosAnteriores = competicaoAberta.idsInscritos;
     competicaoAberta.idsInscritos = novosInscritos;
-    const erro = guardarCadastro(prefixoCompeticoes, competicaoAberta.id, competicaoAberta);
+
+    const alteracoes = [{ chave: prefixoCompeticoes + competicaoAberta.id, item: competicaoAberta }];
+    if (novoAtleta) {
+        alteracoes.push({ chave: prefixoAtletas + novoAtleta.id, item: novoAtleta });
+    }
+
+    const erro = guardarCadastros(alteracoes);
     if (erro) {
         competicaoAberta.idsInscritos = inscritosAnteriores;
-        mostrarMensagemPerfil(erro, true);
+        if (modalInscricao.open) {
+            erroInscricao.textContent = erro;
+        } else {
+            mostrarMensagemPerfil(erro, true);
+        }
         return false;
     }
     return true;
@@ -555,25 +647,59 @@ function salvarInscritos(novosInscritos) {
 
 function inscreverAtleta(evento) {
     evento.preventDefault();
-    const id = atletaInscricao.value;
+    const id = idAtletaSelecionado;
     const inscritos = competicaoAberta.idsInscritos;
     if (inscritos.length >= competicaoAberta.capacidade || inscritos.includes(id) || indicePorId(atletas, id) === -1) {
-        mostrarMensagemPerfil("Selecione um atleta disponível para uma vaga livre.", true);
+        erroInscricao.textContent = "Selecione um atleta disponível para uma vaga livre.";
         return;
     }
 
     const novosInscritos = inscritos.slice();
     novosInscritos.push(id);
     if (salvarInscritos(novosInscritos)) {
-        fecharInscricao();
-        pesquisaInscritos.value = "";
-        atualizarPerfil();
-        mostrarMensagemPerfil("Atleta inscrito.", false);
-        if (btnInscrever.disabled) {
-            tituloPerfil.focus();
+        concluirInscricao("Atleta inscrito.");
+    }
+}
+
+function cadastrarEInscreverAtleta(evento) {
+    evento.preventDefault();
+    const nome = nomeNovoInscrito.value.trim();
+    const pais = paisNovoInscrito.value.trim();
+    if (nome === "" || pais === "") {
+        erroInscricao.textContent = "Preencha o nome e o país de origem.";
+        if (nome === "") {
+            nomeNovoInscrito.focus();
         } else {
-            btnInscrever.focus();
+            paisNovoInscrito.focus();
         }
+        return;
+    }
+
+    const inscritos = competicaoAberta.idsInscritos;
+    if (inscritos.length >= competicaoAberta.capacidade) {
+        erroInscricao.textContent = "Todas as vagas estão ocupadas.";
+        return;
+    }
+
+    const atleta = criarCadastroAtleta(nome, nascimentoNovoInscrito.value, pais, modalidadeNovoInscrito.value);
+    const novosInscritos = inscritos.slice();
+    novosInscritos.push(atleta.id);
+    if (salvarInscritos(novosInscritos, atleta)) {
+        atletas.push(atleta);
+        atualizarContadores();
+        concluirInscricao("Atleta cadastrado e inscrito.");
+    }
+}
+
+function concluirInscricao(mensagem) {
+    fecharInscricao();
+    pesquisaInscritos.value = "";
+    atualizarPerfil();
+    mostrarMensagemPerfil(mensagem, false);
+    if (btnInscrever.disabled) {
+        tituloPerfil.focus();
+    } else {
+        btnInscrever.focus();
     }
 }
 
@@ -727,18 +853,34 @@ function excluirAtleta() {
 }
 
 // Carrega e atualiza os registros salvos no navegador.
+function lerCadastros(dados) {
+    if (dados !== null) {
+        return JSON.parse(dados);
+    }
+
+    // As versões anteriores guardavam cada cadastro em uma chave separada.
+    const cadastros = {};
+    const chaves = Object.keys(localStorage);
+    for (let i = 0; i < chaves.length; i++) {
+        const chave = chaves[i];
+        if (chave.startsWith(prefixoCompeticoes) || chave.startsWith(prefixoAtletas)) {
+            cadastros[chave] = JSON.parse(localStorage.getItem(chave));
+        }
+    }
+    return cadastros;
+}
+
 function carregarCadastros(itens, prefixo) {
     try {
-        const chaves = Object.keys(localStorage).sort();
+        const cadastros = lerCadastros(localStorage.getItem(chaveCadastros));
+        const chaves = Object.keys(cadastros).sort();
 
-        // Cada cadastro fica guardado em sua própria chave.
         for (let i = 0; i < chaves.length; i++) {
             const chave = chaves[i];
             if (chave.startsWith(prefixo)) {
                 const id = chave.slice(prefixo.length);
-                const dados = localStorage.getItem(chave);
-                const item = JSON.parse(dados);
-                cadastrosLidos[chave] = dados;
+                const item = cadastros[chave];
+                cadastrosLidos[chave] = JSON.stringify(item);
                 const indice = indicePorId(itens, id);
 
                 // Um registro nulo mantém um cadastro excluído após recarregar.
@@ -770,21 +912,46 @@ function criarId() {
 }
 
 function guardarCadastro(prefixo, id, item) {
-    const chave = prefixo + id;
+    return guardarCadastros([{ chave: prefixo + id, item: item }]);
+}
+
+function guardarCadastros(alteracoes) {
+    let chavesAntigas = [];
     try {
-        // Preserva alterações feitas em outra aba desde a última leitura.
-        const dadosLidos = cadastrosLidos[chave] || null;
-        if (localStorage.getItem(chave) !== dadosLidos) {
-            return "O cadastro mudou em outra aba. Recarregue a página para ver a versão atual.";
+        const dados = localStorage.getItem(chaveCadastros);
+        const cadastros = lerCadastros(dados);
+        if (dados === null) {
+            chavesAntigas = Object.keys(cadastros);
         }
 
-        const dados = JSON.stringify(item);
-        localStorage.setItem(chave, dados);
-        cadastrosLidos[chave] = dados;
-        return "";
+        for (let i = 0; i < alteracoes.length; i++) {
+            const alteracao = alteracoes[i];
+            const chave = alteracao.chave;
+            // Preserva alterações feitas em outra aba desde a última leitura.
+            if (JSON.stringify(cadastros[chave]) !== cadastrosLidos[chave]) {
+                return "O cadastro mudou em outra aba. Recarregue a página para ver a versão atual.";
+            }
+            cadastros[chave] = alteracao.item;
+        }
+
+        // Um único salvamento grava o atleta novo e sua inscrição juntos.
+        localStorage.setItem(chaveCadastros, JSON.stringify(cadastros));
+        for (let i = 0; i < alteracoes.length; i++) {
+            const alteracao = alteracoes[i];
+            cadastrosLidos[alteracao.chave] = JSON.stringify(alteracao.item);
+        }
     } catch {
         return "Não foi possível salvar a alteração neste navegador.";
     }
+
+    try {
+        for (let i = 0; i < chavesAntigas.length; i++) {
+            localStorage.removeItem(chavesAntigas[i]);
+        }
+    } catch {
+        // A cópia nova já foi salva e será usada ao recarregar.
+    }
+    return "";
 }
 
 function atualizarContadores() {
@@ -843,16 +1010,19 @@ function mostrarFormularioCompeticao() {
     nomeCompeticao.focus();
 }
 
-function mostrarFormularioAtleta() {
-    formAtleta.reset();
-    erroCadastroAtleta.textContent = "";
-    nascimentoAtleta.required = true;
-
+function limitarNascimento(campo) {
     // O campo de nascimento aceita datas até hoje.
     const hoje = new Date();
     const mes = String(hoje.getMonth() + 1).padStart(2, "0");
     const dia = String(hoje.getDate()).padStart(2, "0");
-    nascimentoAtleta.max = hoje.getFullYear() + "-" + mes + "-" + dia;
+    campo.max = hoje.getFullYear() + "-" + mes + "-" + dia;
+}
+
+function mostrarFormularioAtleta() {
+    formAtleta.reset();
+    erroCadastroAtleta.textContent = "";
+    nascimentoAtleta.required = true;
+    limitarNascimento(nascimentoAtleta);
 
     const titulo = document.getElementById("tituloCadastroAtleta");
     const voltar = document.getElementById("voltarAtletas");
@@ -970,6 +1140,16 @@ function salvarCompeticao(evento) {
     }
 }
 
+function criarCadastroAtleta(nome, nascimento, pais, modalidade) {
+    return {
+        id: criarId(),
+        nome: nome,
+        dataNascimento: nascimento,
+        nacionalidade: pais,
+        modalidade: modalidade
+    };
+}
+
 function salvarAtleta(evento) {
     evento.preventDefault();
 
@@ -985,13 +1165,7 @@ function salvarAtleta(evento) {
         return;
     }
 
-    const novoAtleta = {
-        id: criarId(),
-        nome: nome,
-        dataNascimento: nascimentoAtleta.value,
-        nacionalidade: pais,
-        modalidade: modalidadeAtleta.value
-    };
+    const novoAtleta = criarCadastroAtleta(nome, nascimentoAtleta.value, pais, modalidadeAtleta.value);
 
     if (atletaAberto) {
         novoAtleta.id = atletaAberto.id;
@@ -1039,9 +1213,18 @@ btnEditarAtleta.addEventListener("click", editarAtleta);
 document.getElementById("excluirAtleta").addEventListener("click", excluirAtleta);
 btnEditarCompeticao.addEventListener("click", editarCompeticao);
 document.getElementById("excluirCompeticao").addEventListener("click", excluirCompeticao);
-btnInscrever.addEventListener("click", alternarInscricao);
-document.getElementById("cancelarInscricao").addEventListener("click", alternarInscricao);
+btnInscrever.addEventListener("click", abrirInscricao);
+document.getElementById("cancelarInscricao").addEventListener("click", fecharInscricao);
+document.getElementById("cancelarNovoInscrito").addEventListener("click", fecharInscricao);
+opcaoAtletaCadastrado.addEventListener("click", function () {
+    mostrarOpcaoInscricao(false);
+});
+opcaoNovoAtleta.addEventListener("click", function () {
+    mostrarOpcaoInscricao(true);
+});
+buscaAtletaInscricao.addEventListener("input", buscarAtletasParaInscricao);
 formInscricao.addEventListener("submit", inscreverAtleta);
+formNovoInscrito.addEventListener("submit", cadastrarEInscreverAtleta);
 pesquisaInscritos.addEventListener("input", mostrarInscritos);
 document.getElementById("filtroInscritos").addEventListener("submit", function (evento) {
     evento.preventDefault();
@@ -1056,6 +1239,7 @@ limparInscricoesSemAtleta();
 const itensComModalidades = exemplosComModalidades.concat(competicoes, atletas);
 preencherModalidades(itensComModalidades, modalidadeCompeticao);
 preencherModalidades(itensComModalidades, modalidadeAtleta);
+preencherModalidades(itensComModalidades, modalidadeNovoInscrito);
 atualizarContadores();
 mostrarAba("competicoes");
 

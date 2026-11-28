@@ -95,20 +95,9 @@
             </div>
 
             <div class="perfil-inscricao">
-                <button type="button" id="btnInscrever" class="botao-perfil" aria-controls="formInscricao"
-                    aria-expanded="false">+ Inscrever Atleta</button>
+                <button type="button" id="btnInscrever" class="botao-perfil botao-inscricao" aria-controls="modalInscricao"
+                    aria-haspopup="dialog">+ Inscrever Atleta</button>
                 <p id="avisoInscricao" hidden></p>
-
-                <form id="formInscricao" hidden>
-                    <label for="atletaInscricao">Atleta</label>
-                    <div class="perfil-campos">
-                        <select id="atletaInscricao" required>
-                            <option value="">Selecione um atleta</option>
-                        </select>
-                        <button type="submit" class="botao-perfil">Inscrever</button>
-                        <button type="button" id="cancelarInscricao" class="botao-perfil">Cancelar</button>
-                    </div>
-                </form>
             </div>
 
             <form id="filtroInscritos" class="perfil-campos perfil-busca">
@@ -133,6 +122,59 @@
                     <tbody id="linhasInscritos"></tbody>
                 </table>
             </div>
+
+            <dialog id="modalInscricao" aria-labelledby="tituloModalInscricao">
+                <div class="topo-modal-inscricao">
+                    <h2 id="tituloModalInscricao">Inscrever Atleta</h2>
+                </div>
+
+                <div class="abas-inscricao" role="group" aria-label="Forma de inscrição">
+                    <button type="button" id="opcaoAtletaCadastrado" aria-pressed="true" aria-controls="formInscricao">Atleta Cadastrado</button>
+                    <button type="button" id="opcaoNovoAtleta" aria-pressed="false" aria-controls="formNovoInscrito">Novo Atleta</button>
+                </div>
+
+                <form id="formInscricao">
+                    <label for="buscaAtletaInscricao">Buscar atleta cadastrado</label>
+                    <input type="search" id="buscaAtletaInscricao" placeholder="Digite o nome do atleta..."
+                        autocomplete="off" aria-controls="resultadosAtletaInscricao" autofocus>
+                    <ul id="resultadosAtletaInscricao" aria-label="Atletas encontrados" hidden></ul>
+                    <p id="mensagemBuscaAtleta" role="status"></p>
+
+                    <div class="acoes-modal-inscricao">
+                        <button type="button" id="cancelarInscricao" class="botao-texto-inscricao">Cancelar</button>
+                        <button type="submit" id="confirmarInscricao" class="botao-perfil" disabled>Confirmar Inscrição</button>
+                    </div>
+                </form>
+
+                <form id="formNovoInscrito" hidden>
+                    <div class="campo-modal-inscricao">
+                        <label for="nomeNovoInscrito">Nome</label>
+                        <input type="text" id="nomeNovoInscrito" placeholder="Nome completo do atleta" required>
+                    </div>
+
+                    <div class="campo-modal-inscricao">
+                        <label for="nascimentoNovoInscrito">Data de Nascimento</label>
+                        <input type="date" id="nascimentoNovoInscrito" required>
+                    </div>
+
+                    <div class="campo-modal-inscricao">
+                        <label for="paisNovoInscrito">País de Origem</label>
+                        <input type="text" id="paisNovoInscrito" placeholder="Ex.: Brasil" required>
+                    </div>
+
+                    <div class="campo-modal-inscricao">
+                        <label for="modalidadeNovoInscrito">Modalidade</label>
+                        <select id="modalidadeNovoInscrito" required></select>
+                    </div>
+
+                    <div class="acoes-modal-inscricao">
+                        <button type="button" id="cancelarNovoInscrito" class="botao-texto-inscricao">Cancelar</button>
+                        <button type="submit" class="botao-perfil botao-inscricao">Cadastrar e Inscrever</button>
+                    </div>
+                </form>
+
+                <p id="erroInscricao" class="erro-cadastro" role="alert"></p>
+            </dialog>
         </section>
 
         <section id="perfilAtleta" aria-labelledby="tituloPerfilAtleta" hidden>
