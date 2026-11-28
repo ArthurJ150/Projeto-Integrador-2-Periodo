@@ -75,4 +75,15 @@ export class Atleta {
         \nModalidades: ${this.#modalidade.join(', ')}
         \nDocumento de Identidade: ${this.#docIdentidade}`;
     }
+
+    stringify() {
+    return JSON.stringify({
+        nome: this.#nome,
+        dataNascimento: this.#dataNascimento,
+        nacionalidade: this.#nacionalidade,
+        modalidade: this.#modalidade,
+        docIdentidade: this.#docIdentidade,
+        habilitado: this.#habilitado
+    });
+}
 }
