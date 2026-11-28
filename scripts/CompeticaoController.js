@@ -23,6 +23,7 @@ export class CompeticaoController {
         let atleta = this.consultarAtleta(docIdentidade);
         if (atleta === undefined) {
             this.#vetAtletas.push(new Atleta(nome, dataNascimento, nacionalidade, modalidade, docIdentidade));
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -43,6 +44,7 @@ export class CompeticaoController {
             if (modalidade !== "") {
                 atleta.adicionarModalidade(modalidade);
             }
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -55,6 +57,7 @@ export class CompeticaoController {
         let atleta = this.consultarAtleta(docIdentidade);
         if (atleta !== undefined) {
             atleta.habilitado = false;
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -133,6 +136,7 @@ export class CompeticaoController {
         let competicao = this.consultarCompeticao(nome);
         if (competicao === undefined) {
             this.#vetCompeticoes.push(new Maratona(nome, local, data, distancia, capacidade, altimetria, percursoUrbano));
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -162,6 +166,7 @@ export class CompeticaoController {
             if (percursoUrbano !== "" || percursoUrbano !== competicao.percursoUrbano) {
                 competicao.percursoUrbano = percursoUrbano;
             }
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -171,6 +176,7 @@ export class CompeticaoController {
         let competicao = this.consultarCompeticao(nome);
         if (competicao === undefined) {
             this.#vetCompeticoes.push(new TrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa));
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -206,6 +212,7 @@ export class CompeticaoController {
             if (tipoDisputa !== "" || tipoDisputa !== competicao.tipoDisputa) {
                 competicao.tipoDisputa = tipoDisputa;
             }
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -216,6 +223,7 @@ export class CompeticaoController {
         if (competicao !== undefined) {
             const index = this.#vetCompeticoes.indexOf(competicao);
             this.#vetCompeticoes.splice(index, 1);
+            this.salvarLocalStorage();
             return true;
         }
         return false;
@@ -225,6 +233,7 @@ export class CompeticaoController {
         let competicao = this.consultarCompeticao(nomeCompeticao);
         let atleta = this.consultarAtleta(docIdentidade);
         if (competicao !== undefined && atleta !== undefined) {
+            this.salvarLocalStorage();
             return competicao.adicionarParticipante(atleta);
         }
         return false;
@@ -366,10 +375,11 @@ export class CompeticaoController {
         }
     }
 }
+
+/* -------------- Testes do localStorage --------------
 const controller = new CompeticaoController();
 controller.cadastrarAtleta("Atleta 3", "1995-03-20", "Chile", ["Maratona", "Trail Running"], "111222333");
 controller.cadastrarMaratona("Competição 3", "Local 3", "2023-12-20", 10, 200, 100, false); 
 controller.salvarLocalStorage();
-
-
+*/
 
