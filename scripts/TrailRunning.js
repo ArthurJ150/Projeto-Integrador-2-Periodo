@@ -57,4 +57,13 @@ export class TrailRunning extends Competicao {
         \nCheckpoints: ${this.#checkpoints}
         \nTipo de Disputa: ${this.#tipoDisputa}`;
     }
+    stringify() {
+        return JSON.stringify({
+            ...JSON.parse(super.stringify()),
+            tipoTerreno: this.#tipoTerreno,
+            nivelDificuldade: this.#nivelDificuldade,
+            checkpoints: this.#checkpoints,
+            tipoDisputa: this.#tipoDisputa
+        });
+    }
 }

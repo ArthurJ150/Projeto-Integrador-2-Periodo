@@ -1,3 +1,4 @@
+
 import { Atleta } from "./Atleta.js";
 import { Maratona } from "./Maratona.js";
 import { TrailRunning } from "./TrailRunning.js";
@@ -9,6 +10,8 @@ export class CompeticaoController {
     constructor() {
         this.#vetCompeticoes = [];
         this.#vetAtletas = [];
+
+        this.carregarDados();
     }
 
     // ---------- Métodos para Atletas ----------
@@ -28,16 +31,16 @@ export class CompeticaoController {
     atualizarAtleta(docIdentidade, nome, dataNascimento, nacionalidade, modalidade) {
         let atleta = this.consultarAtleta(docIdentidade);
         if (atleta !== undefined) {
-            if(nome !== "" || nome !== atleta.nome) {
+            if (nome !== "" || nome !== atleta.nome) {
                 atleta.nome = nome;
             }
-            if(dataNascimento !== "" || dataNascimento !== atleta.dataNascimento) {
+            if (dataNascimento !== "" || dataNascimento !== atleta.dataNascimento) {
                 atleta.dataNascimento = dataNascimento;
             }
-            if(nacionalidade !== "" || nacionalidade !== atleta.nacionalidade) {
+            if (nacionalidade !== "" || nacionalidade !== atleta.nacionalidade) {
                 atleta.nacionalidade = nacionalidade;
             }
-            if(modalidade !== "") {
+            if (modalidade !== "") {
                 atleta.adicionarModalidade(modalidade);
             }
             return true;
@@ -54,30 +57,13 @@ export class CompeticaoController {
             atleta.habilitado = false;
             return true;
         }
-        return false;   
+        return false;
     }
 
-    calcularIdade(dataNascimento) {
-        const partes = dataNascimento.split("-");
-        const anoNascimento = Number(partes[0]);
-        const mesNascimento = Number(partes[1]);
-        const diaNascimento = Number(partes[2]);
-        const hoje = new Date();
-        const mesAtual = hoje.getMonth() + 1;
-        let idade = hoje.getFullYear() - anoNascimento;
-
-        // Desconta um ano se o aniversário deste ano ainda não chegou.
-        if (mesAtual < mesNascimento || (mesAtual === mesNascimento && hoje.getDate() < diaNascimento)) {
-            idade--;
-        }
-
-        return idade;
-    }
-
-    listarAtletas(){
+    listarAtletas() {
         var vetObjLiteraisAtletals = [];
         this.#vetAtletas.forEach(atleta => {
-            if(atleta.habilitado){
+            if (atleta.habilitado) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
                     idade: this.calcularIdade(atleta.dataNascimento),
@@ -92,7 +78,7 @@ export class CompeticaoController {
     filtrarAtletasPorModalidade(modalidade) {
         var vetObjLiteraisAtletals = [];
         this.#vetAtletas.forEach(atleta => {
-            if(atleta.habilitado && atleta.modalidade.includes(modalidade)) {
+            if (atleta.habilitado && atleta.modalidade.includes(modalidade)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
                     idade: this.calcularIdade(atleta.dataNascimento),
@@ -107,7 +93,7 @@ export class CompeticaoController {
     filtrarAtletasPorNome(nome) {
         var vetObjLiteraisAtletals = [];
         this.#vetAtletas.forEach(atleta => {
-            if(atleta.habilitado && atleta.nome.includes(nome)) {
+            if (atleta.habilitado && atleta.nome.includes(nome)) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
                     idade: this.calcularIdade(atleta.dataNascimento),
@@ -245,7 +231,7 @@ export class CompeticaoController {
     }
 
     filtrarCompeticoesPorModalidade(modalidade) {
-        var vetObjLiteraisCompeticoes = [];
+        let vetObjLiteraisCompeticoes = [];
         this.#vetCompeticoes.forEach(competicao => {
             if (competicao instanceof Maratona && modalidade === "Maratona") {
                 vetObjLiteraisCompeticoes.push({
@@ -271,7 +257,7 @@ export class CompeticaoController {
     }
 
     filtrarCompeticoesPorNome(nome) {
-        var vetObjLiteraisCompeticoes = [];
+        let vetObjLiteraisCompeticoes = [];
         this.#vetCompeticoes.forEach(competicao => {
             if (competicao.nome.includes(nome)) {
                 vetObjLiteraisCompeticoes.push({
@@ -286,4 +272,104 @@ export class CompeticaoController {
         });
         return vetObjLiteraisCompeticoes;
     }
+
+    salvarLocalStorage() {
+        let strJSONVetAtletas = "[";
+        for (let i = 0; i < this.#vetAtletas.length; i++) {
+            if (i > 0) {
+                strJSONVetAtletas += ",";
+            }
+            strJSONVetAtletas += this.#vetAtletas[i].stringify();
+        }
+        strJSONVetAtletas += "]";
+        localStorage.setItem("atletasSalvos", strJSONVetAtletas);
+
+        let strJSONVetCompeticoes = "[";
+        for (let i = 0; i < this.#vetCompeticoes.length; i++) {
+            if (i > 0) {
+                strJSONVetCompeticoes += ",";
+            }
+            strJSONVetCompeticoes += this.#vetCompeticoes[i].stringify();
+        }
+        strJSONVetCompeticoes += "]";
+        localStorage.setItem("competicoesSalvas", strJSONVetCompeticoes);
+    }
+
+    carregarDados() {
+        
+        if (localStorage.hasOwnProperty("atletasSalvos")) {
+            let strJSONVetAtletas = localStorage.getItem("atletasSalvos");
+
+            let vetAtletasSalvos = JSON.parse(strJSONVetAtletas);
+
+            vetAtletasSalvos.forEach(objLitAtleta => {
+                let atleta = new Atleta(
+                    objLitAtleta.nome,
+                    objLitAtleta.dataNascimento,
+                    objLitAtleta.nacionalidade,
+                    objLitAtleta.modalidade[0],
+                    objLitAtleta.docIdentidade
+                );
+
+                for (let i = 1; i < objLitAtleta.modalidade.length; i++) {
+                    atleta.adicionarModalidade(objLitAtleta.modalidade[i]);
+                }
+
+                atleta.habilitado = objLitAtleta.habilitado;
+
+                this.#vetAtletas.push(atleta);
+            });
+        
+            this.#vetAtletas = [
+                new Atleta("Atleta 1", "1990-01-01", "Brasil", ["Maratona"], "123456789"),
+                new Atleta("Atleta 2", "1985-05-15", "Argentina", ["Trail Running"], "987654321")
+            ];
+        }
+        
+        if (localStorage.hasOwnProperty("competicoesSalvas")) {
+            let strJSONVetCompeticoes = localStorage.getItem("competicoesSalvas");
+
+            let vetCompeticoesSalvas = JSON.parse(strJSONVetCompeticoes);
+
+            vetCompeticoesSalvas.forEach(objLitCompeticao => {
+                let competicao;
+                if (objLitCompeticao.hasOwnProperty("altimetria")) {
+                    competicao = new TrailRunning(
+                        objLitCompeticao.nome,
+                        objLitCompeticao.data,
+                        objLitCompeticao.local,
+                        objLitCompeticao.distancia,
+                        objLitCompeticao.altimetria,
+                        objLitCompeticao.tipoTerreno,
+                        objLitCompeticao.dificuldade,
+                        objLitCompeticao.numParticipantes,
+                        objLitCompeticao.modalidade
+                    );
+                } else {
+                    competicao = new Maratona(
+                        objLitCompeticao.nome,
+                        objLitCompeticao.data,
+                        objLitCompeticao.local,
+                        objLitCompeticao.distancia,
+                        objLitCompeticao.numParticipantes,
+                        objLitCompeticao.precoInscricao,
+                        objLitCompeticao.habilitada
+                    );
+                }
+                this.#vetCompeticoes.push(competicao);
+            });
+        
+            this.#vetCompeticoes = [
+                new Maratona("Competição 1", "2023-10-10", "Local 1", 42.195, 100, 500, true),
+                new TrailRunning("Competição 2", "2023-11-15", "Local 2", 21.097, 50, "Montanhoso", "Difícil", 5, "Individual")
+            ];
+        }
+    }
 }
+const controller = new CompeticaoController();
+controller.cadastrarAtleta("Atleta 3", "1995-03-20", "Chile", ["Maratona", "Trail Running"], "111222333");
+controller.cadastrarMaratona("Competição 3", "Local 3", "2023-12-20", 10, 200, 100, false); 
+controller.salvarLocalStorage();
+
+
+

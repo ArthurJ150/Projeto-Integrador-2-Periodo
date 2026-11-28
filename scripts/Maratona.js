@@ -31,4 +31,11 @@ export class Maratona extends Competicao {
         \nAltimetria: ${this.#altimetria} m
         \nPercurso Urbano: ${this.#percursoUrbano ? "Sim" : "Não"}`;
     }
+    stringfy() {
+        return JSON.stringify({
+            ...JSON.parse(super.stringify()),
+            altimetria: this.#altimetria,
+            percursoUrbano: this.#percursoUrbano
+        });
+    }
 }

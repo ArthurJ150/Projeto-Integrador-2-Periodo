@@ -98,4 +98,14 @@ export class Competicao {
         \nCapacidade: ${this.#capacidade} participantes
         \nParticipantes: ${this.#participantes.map((atleta) => atleta.nome).join(", ")}`;
     }
+    stringify() {
+        return JSON.stringify({
+            nome: this.#nome,
+            local: this.#local,
+            data: this.#data,
+            distancia: this.#distancia,
+            capacidade: this.#capacidade,
+            participantes: this.#participantes.map((atleta) => atleta.stringify())
+        });
+    }
 }
