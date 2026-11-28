@@ -6,6 +6,10 @@ const abas = document.querySelectorAll(".abas button");
 const navegacao = document.getElementById("navegacao");
 const lista = document.getElementById("lista");
 const relatorio = document.getElementById("relatorio");
+const linhasRelatorio = document.getElementById("linhasRelatorio");
+const totalVagas = document.getElementById("totalVagas");
+const totalDisponiveis = document.getElementById("totalDisponiveis");
+const totalOcupadas = document.getElementById("totalOcupadas");
 const inPesquisa = document.getElementById("inPesquisa");
 const slModalidades = document.getElementById("slModalidades");
 const cards = document.getElementById("cards");
@@ -126,6 +130,39 @@ function criarCardsAtletas() {
     semResultados.hidden = atletas.length > 0;
 }
 
+function criarRelatorio() {
+    const linhas = document.createDocumentFragment();
+    let somaVagas = 0;
+    let somaDisponiveis = 0;
+    let somaOcupadas = 0;
+
+    for (const dados of controller.filtrarCompeticoesPorNome("")) {
+        const competicao = controller.consultarCompeticao(dados.nome);
+        const vagas = Number(dados.capacidade ?? 0);
+        const ocupadas = competicao.participantes.length;
+        const disponiveis = Math.max(0, vagas - ocupadas);
+
+        const linha = document.createElement("tr");
+        const nome = document.createElement("th");
+        nome.scope = "row";
+        nome.textContent = dados.nome;
+        linha.appendChild(nome);
+        for (const valor of [vagas, disponiveis, ocupadas]) {
+            linha.insertCell().textContent = String(valor);
+        }
+        linhas.appendChild(linha);
+
+        somaVagas += vagas;
+        somaDisponiveis += disponiveis;
+        somaOcupadas += ocupadas;
+    }
+
+    linhasRelatorio.replaceChildren(linhas);
+    totalVagas.textContent = String(somaVagas);
+    totalDisponiveis.textContent = String(somaDisponiveis);
+    totalOcupadas.textContent = String(somaOcupadas);
+}
+
 function mostrarAba(aba) {
     const botoes = Array.from(abas);
     if (!botoes.some(botao => botao.dataset.aba === aba)) {
@@ -142,6 +179,7 @@ function mostrarAba(aba) {
     sucessoCadastro.hidden = true;
 
     if (mostrarRelatorio) {
+        criarRelatorio();
         return;
     }
 
