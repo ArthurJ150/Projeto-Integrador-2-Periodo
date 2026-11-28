@@ -1,11 +1,287 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Gestão de Competições</title>
+    <link rel="stylesheet" href="style/style.css">
 </head>
+
 <body>
-    
+    <header class="cabecalho">
+        <div class="marca">
+            <img src="Logo.png" alt="" width="48" height="32">
+            <h1>Gestão de Competições</h1>
+        </div>
+
+        <div class="contadores">
+            <span id="totalCompeticoes"></span>
+            <span id="totalAtletas"></span>
+        </div>
+    </header>
+
+    <main>
+        <nav id="navegacao" class="abas" aria-label="Seções da ferramenta">
+            <button type="button" data-aba="competicoes" aria-pressed="true">Competições</button>
+            <button type="button" data-aba="atletas" aria-pressed="false">Atletas</button>
+            <button type="button" data-aba="relatorio" aria-pressed="false">Relatório</button>
+        </nav>
+
+        <section id="lista" aria-label="Competições">
+            <div id="filtros">
+                <input type="search" id="inPesquisa" aria-label="Buscar competição ou local"
+                    placeholder="Buscar competição ou local...">
+
+                <select id="slModalidades" aria-label="Filtrar por modalidade">
+                    <option value="">Todas as modalidades</option>
+                </select>
+
+                <button type="button" id="btnAdicionar">+ Adicionar Competição</button>
+            </div>
+
+            <p id="semResultados" role="status" hidden></p>
+            <p id="sucessoCadastro" role="status" hidden></p>
+
+            <div id="cards">
+                <button type="button" id="cardAdicionar">
+                    <span class="sinal-adicionar" aria-hidden="true">+</span>
+                    <span id="textoCardAdicionar">Adicionar Competição</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="relatorio" aria-label="Relatório de vagas" hidden>
+            <table aria-label="Vagas por competição">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome da Competição</th>
+                        <th scope="col">Vagas Totais</th>
+                        <th scope="col">Vagas Disponíveis</th>
+                        <th scope="col">Vagas Ocupadas</th>
+                    </tr>
+                </thead>
+
+                <tbody id="linhasRelatorio"></tbody>
+
+                <tfoot>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td id="totalVagas"></td>
+                        <td id="totalDisponiveis"></td>
+                        <td id="totalOcupadas"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+
+        <section id="perfilCompeticao" aria-labelledby="tituloPerfil" hidden>
+            <div class="perfil-acoes">
+                <button type="button" id="voltarDoPerfil" class="voltar-cadastro">← Voltar para Competições</button>
+                <div class="perfil-botoes">
+                    <button type="button" id="editarCompeticao" class="botao-perfil">Editar Competição</button>
+                    <button type="button" id="excluirCompeticao" class="botao-perfil botao-excluir">Excluir</button>
+                </div>
+            </div>
+
+            <div class="perfil-cabecalho">
+                <h2 id="tituloPerfil" tabindex="-1"></h2>
+                <p id="informacoesPerfil"></p>
+            </div>
+
+            <div class="perfil-numeros">
+                <p><strong id="vagasPerfil"></strong><span id="textoVagasPerfil"></span></p>
+                <p><strong id="diasPerfil"></strong><span>Dias Para o Início</span></p>
+            </div>
+
+            <div class="perfil-inscricao">
+                <button type="button" id="btnInscrever" class="botao-perfil" aria-controls="formInscricao"
+                    aria-expanded="false">+ Inscrever Atleta</button>
+                <p id="avisoInscricao" hidden></p>
+
+                <form id="formInscricao" hidden>
+                    <label for="atletaInscricao">Atleta</label>
+                    <div class="perfil-campos">
+                        <select id="atletaInscricao" required>
+                            <option value="">Selecione um atleta</option>
+                        </select>
+                        <button type="submit" class="botao-perfil">Inscrever</button>
+                        <button type="button" id="cancelarInscricao" class="botao-perfil">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <form id="filtroInscritos" class="perfil-campos perfil-busca">
+                <input type="search" id="pesquisaInscritos" aria-label="Buscar inscritos por nome"
+                    placeholder="Digite o nome do atleta...">
+                <button type="submit" class="botao-perfil">Buscar</button>
+            </form>
+
+            <p id="mensagemPerfil" role="status" hidden></p>
+
+            <div class="tabela-inscritos" tabindex="0" role="region" aria-label="Atletas inscritos">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Idade</th>
+                            <th scope="col">Nacionalidade</th>
+                            <th scope="col">Modalidade</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linhasInscritos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="perfilAtleta" aria-labelledby="tituloPerfilAtleta" hidden>
+            <div class="perfil-acoes">
+                <button type="button" id="voltarDoPerfilAtleta" class="voltar-cadastro">← Voltar para Atletas</button>
+                <div class="perfil-botoes">
+                    <button type="button" id="editarAtleta" class="botao-perfil">Editar Atleta</button>
+                    <button type="button" id="excluirAtleta" class="botao-perfil botao-excluir">Excluir</button>
+                </div>
+            </div>
+
+            <div class="painel-atleta">
+                <h2 id="tituloPerfilAtleta" tabindex="-1">Atleta</h2>
+
+                <div class="dados-perfil-atleta">
+                    <dl>
+                        <div><dt>Nome:</dt><dd id="nomePerfilAtleta"></dd></div>
+                        <div><dt>Data de Nascimento:</dt><dd id="nascimentoPerfilAtleta"></dd></div>
+                        <div><dt>País de Origem:</dt><dd id="paisPerfilAtleta"></dd></div>
+                        <div><dt>Modalidade:</dt><dd id="modalidadePerfilAtleta"></dd></div>
+                    </dl>
+                    <div id="iniciaisPerfilAtleta" class="avatar-perfil-atleta" aria-hidden="true"></div>
+                </div>
+
+                <div class="historico-atleta">
+                    <h3>Competições do atleta</h3>
+                    <p id="semCompeticoesAtleta" hidden>Nenhuma competição vinculada a este atleta.</p>
+                    <ul id="competicoesDoAtleta"></ul>
+                </div>
+
+                <p id="mensagemPerfilAtleta" role="status" hidden></p>
+            </div>
+        </section>
+
+        <section id="cadastroCompeticao" class="tela-cadastro" aria-labelledby="tituloCadastro" hidden>
+            <button type="button" id="voltarCompeticoes" class="voltar-cadastro">← Voltar para Competições</button>
+
+            <form id="formCompeticao" class="form-cadastro">
+                <h2 id="tituloCadastro">Competição</h2>
+
+                <div class="campo-cadastro">
+                    <label for="nomeCompeticao">Nome</label>
+                    <input type="text" id="nomeCompeticao" required>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="dataCompeticao">Data do Evento</label>
+                    <input type="date" id="dataCompeticao" required>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="localCompeticao">Local do Evento</label>
+                    <input type="text" id="localCompeticao" required>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="modalidadeCompeticao">Modalidade</label>
+                    <select id="modalidadeCompeticao" required></select>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="vagasCompeticao">Total de Vagas</label>
+                    <input type="number" id="vagasCompeticao" min="1" step="1" value="40" required>
+                </div>
+
+                <button type="submit" id="btnTerminar" class="btn-terminar">Terminar</button>
+                <p id="erroCadastro" class="erro-cadastro" role="alert"></p>
+            </form>
+        </section>
+
+        <section id="cadastroAtleta" class="tela-cadastro" aria-labelledby="tituloCadastroAtleta" hidden>
+            <button type="button" id="voltarAtletas" class="voltar-cadastro">← Voltar para Atletas</button>
+
+            <form id="formAtleta" class="form-cadastro">
+                <h2 id="tituloCadastroAtleta">Atleta</h2>
+
+                <div class="campo-cadastro">
+                    <label for="nomeAtleta">Nome</label>
+                    <input type="text" id="nomeAtleta" required>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="nascimentoAtleta">Data de Nascimento</label>
+                    <input type="date" id="nascimentoAtleta" required>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="paisAtleta">País de Origem</label>
+                    <input type="text" id="paisAtleta" required>
+                </div>
+
+                <div class="campo-cadastro">
+                    <label for="modalidadeAtleta">Modalidade</label>
+                    <select id="modalidadeAtleta" required></select>
+                </div>
+
+                <button type="submit" id="btnTerminarAtleta" class="btn-terminar">Terminar</button>
+                <p id="erroCadastroAtleta" class="erro-cadastro" role="alert"></p>
+            </form>
+        </section>
+    </main>
+
+    <template id="modeloCard">
+        <article class="card">
+            <div class="card-topo">
+                <div class="card-modalidade">
+                    <span class="card-iniciais" aria-hidden="true" hidden></span>
+                    <span class="card-etiqueta"></span>
+                </div>
+
+                <p class="card-resumo"></p>
+            </div>
+
+            <div class="card-conteudo">
+                <h2></h2>
+                <p class="card-primeira-info"></p>
+                <p class="card-segunda-info"></p>
+            </div>
+
+            <div class="card-rodape">
+                <button type="button"></button>
+            </div>
+        </article>
+    </template>
+
+    <template id="modeloInscrito">
+        <tr>
+            <th scope="row"></th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="acoes-inscrito">
+                <button type="button" class="ficha-inscrito">Ficha</button>
+                <button type="button" class="remover-inscrito">Remover</button>
+            </td>
+        </tr>
+    </template>
+
+    <template id="modeloCompeticaoDoAtleta">
+        <li class="competicao-do-atleta">
+            <div>
+                <strong></strong>
+                <p></p>
+            </div>
+            <span class="status-competicao-atleta"></span>
+        </li>
+    </template>
+
+    <script src="script/scriptStyle.js"></script>
 </body>
+
 </html>
