@@ -4,8 +4,8 @@ export class Maratona extends Competicao {
     #altimetria;
     #percursoUrbano;
 
-    constructor(nome, local, data, distancia, capacidade, altimetria, percursoUrbano) {
-        super(nome, local, data, distancia, capacidade);
+    constructor(nome, local, data, distancia, capacidade, altimetria, percursoUrbano, participantes) {
+        super(nome, local, data, distancia, capacidade, participantes);
         this.#altimetria = altimetria;
         this.#percursoUrbano = percursoUrbano;
     }
@@ -31,11 +31,16 @@ export class Maratona extends Competicao {
         \nAltimetria: ${this.#altimetria} m
         \nPercurso Urbano: ${this.#percursoUrbano ? "Sim" : "Não"}`;
     }
-    stringfy() {
+    stringify() {
         return JSON.stringify({
             ...JSON.parse(super.stringify()),
+            modalidade: "Maratona",
             altimetria: this.#altimetria,
             percursoUrbano: this.#percursoUrbano
         });
+    }
+
+    stringfy() {
+        return this.stringify();
     }
 }

@@ -8,7 +8,7 @@ export class Competicao {
     #capacidade;
     #participantes;
 
-    constructor(nome, local, data, distancia, capacidade) {
+    constructor(nome, local, data, distancia, capacidade, participantes = []) {
         this.#nome = nome;
         this.#local = local;
         this.#data = data;
@@ -18,7 +18,7 @@ export class Competicao {
         if (capacidade > 0) {
             this.#capacidade = capacidade;
         }
-        this.#participantes = [];
+        this.#participantes = participantes.slice();
     }
 
     get nome() {
@@ -71,7 +71,7 @@ export class Competicao {
 
     adicionarParticipante(atleta) {
         if (this.#participantes.length < this.#capacidade) {
-            if (atleta instanceof Atleta && atleta.habilitado) {
+            if (atleta instanceof Atleta && atleta.habilitado && !this.#participantes.includes(atleta)) {
                 this.#participantes.push(atleta);
                 return true;
             }

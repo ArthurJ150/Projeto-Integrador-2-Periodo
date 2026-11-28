@@ -1,4 +1,4 @@
-
+﻿
 import { Atleta } from "./Atleta.js";
 import { Maratona } from "./Maratona.js";
 import { TrailRunning } from "./TrailRunning.js";
@@ -82,6 +82,8 @@ export class CompeticaoController {
             if (atleta.habilitado) {
                 vetObjLiteraisAtletals.push({
                     nome: atleta.nome,
+                    // A View precisa da chave para abrir a ficha certa, inclusive entre homônimos.
+                    docIdentidade: atleta.docIdentidade,
                     idade: this.calcularIdade(atleta.dataNascimento),
                     nacionalidade: atleta.nacionalidade,
                     modalidade: atleta.modalidade
@@ -155,8 +157,12 @@ export class CompeticaoController {
         return false;
     }
 
-    editarMaratona(nome, local, data, distancia, capacidade, altimetria, percursoUrbano) {
-        let competicao = this.consultarCompeticao(nome);
+    // Usa o nome anterior para localizar a prova durante uma renomeação e evitar nomes duplicados.
+    editarMaratona(nome, local, data, distancia, capacidade, altimetria, percursoUrbano, nomeAnterior = nome) {
+        let competicao = this.consultarCompeticao(nomeAnterior);
+        if (nome !== nomeAnterior && this.consultarCompeticao(nome) !== undefined) {
+            return false;
+        }
         if (competicao !== undefined && competicao instanceof Maratona) {
             if (nome !== "" || nome !== competicao.nome) {
                 competicao.nome = nome;
@@ -195,8 +201,12 @@ export class CompeticaoController {
         return false;
     }
 
-    editarTrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa) {
-        let competicao = this.consultarCompeticao(nome);
+    // Usa o nome anterior para localizar a prova durante uma renomeação e evitar nomes duplicados.
+    editarTrailRunning(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa, nomeAnterior = nome) {
+        let competicao = this.consultarCompeticao(nomeAnterior);
+        if (nome !== nomeAnterior && this.consultarCompeticao(nome) !== undefined) {
+            return false;
+        }
         if (competicao !== undefined && competicao instanceof TrailRunning) {
             if (nome !== "" || nome !== competicao.nome) {
                 competicao.nome = nome;
@@ -245,9 +255,21 @@ export class CompeticaoController {
     cadastrarAtletaEmCompeticao(nomeCompeticao, docIdentidade) {
         let competicao = this.consultarCompeticao(nomeCompeticao);
         let atleta = this.consultarAtleta(docIdentidade);
-        if (competicao !== undefined && atleta !== undefined) {
+        if (competicao !== undefined && competicao.adicionarParticipante(atleta)) {
+            // A gravação fica direto no if para simplificar o fluxo e só ocorre após a inclusão.
             this.salvarLocalStorage();
-            return competicao.adicionarParticipante(atleta);
+            return true;
+        }
+        return false;
+    }
+
+    // A ação Remover da tabela precisa atualizar o modelo e persistir a remoção.
+    removerAtletaDaCompeticao(nomeCompeticao, docIdentidade) {
+        let competicao = this.consultarCompeticao(nomeCompeticao);
+        let atleta = this.consultarAtleta(docIdentidade);
+        if (competicao !== undefined && competicao.removerParticipante(atleta)) {
+            this.salvarLocalStorage();
+            return true;
         }
         return false;
     }
@@ -317,75 +339,38 @@ export class CompeticaoController {
         localStorage.setItem("competicoesSalvas", strJSONVetCompeticoes);
     }
 
+    // Reconstrói os modelos com os campos salvos e resolve os vínculos pelos documentos.
+    // Os dados de exemplo substituíam os registros do usuário a cada recarregamento.
     carregarDados() {
-        
-        if (localStorage.hasOwnProperty("atletasSalvos")) {
-            let strJSONVetAtletas = localStorage.getItem("atletasSalvos");
+        const atletasSalvos = JSON.parse(localStorage.getItem("atletasSalvos") ?? "[]");
+        const competicoesSalvas = JSON.parse(localStorage.getItem("competicoesSalvas") ?? "[]");
 
-            let vetAtletasSalvos = JSON.parse(strJSONVetAtletas);
+        this.#vetAtletas = atletasSalvos.map(dados => {
+            const [primeira, ...outras] = [dados.modalidade].flat(Infinity).filter(Boolean);
+            const atleta = new Atleta(dados.nome, dados.dataNascimento, dados.nacionalidade,
+                primeira, dados.docIdentidade);
+            for (const modalidade of outras) {
+                atleta.adicionarModalidade(modalidade);
+            }
+            atleta.habilitado = dados.habilitado ?? true;
+            return atleta;
+        });
 
-            vetAtletasSalvos.forEach(objLitAtleta => {
-                let atleta = new Atleta(
-                    objLitAtleta.nome,
-                    objLitAtleta.dataNascimento,
-                    objLitAtleta.nacionalidade,
-                    objLitAtleta.modalidade[0],
-                    objLitAtleta.docIdentidade
-                );
-
-                for (let i = 1; i < objLitAtleta.modalidade.length; i++) {
-                    atleta.adicionarModalidade(objLitAtleta.modalidade[i]);
-                }
-
-                atleta.habilitado = objLitAtleta.habilitado;
-
-                this.#vetAtletas.push(atleta);
-            });
-        
-            this.#vetAtletas = [
-                new Atleta("Atleta 1", "1990-01-01", "Brasil", ["Maratona"], "123456789"),
-                new Atleta("Atleta 2", "1985-05-15", "Argentina", ["Trail Running"], "987654321")
-            ];
-        }
-        
-        if (localStorage.hasOwnProperty("competicoesSalvas")) {
-            let strJSONVetCompeticoes = localStorage.getItem("competicoesSalvas");
-
-            let vetCompeticoesSalvas = JSON.parse(strJSONVetCompeticoes);
-
-            vetCompeticoesSalvas.forEach(objLitCompeticao => {
-                let competicao;
-                if (objLitCompeticao.hasOwnProperty("altimetria")) {
-                    competicao = new TrailRunning(
-                        objLitCompeticao.nome,
-                        objLitCompeticao.data,
-                        objLitCompeticao.local,
-                        objLitCompeticao.distancia,
-                        objLitCompeticao.altimetria,
-                        objLitCompeticao.tipoTerreno,
-                        objLitCompeticao.dificuldade,
-                        objLitCompeticao.numParticipantes,
-                        objLitCompeticao.modalidade
-                    );
-                } else {
-                    competicao = new Maratona(
-                        objLitCompeticao.nome,
-                        objLitCompeticao.data,
-                        objLitCompeticao.local,
-                        objLitCompeticao.distancia,
-                        objLitCompeticao.numParticipantes,
-                        objLitCompeticao.precoInscricao,
-                        objLitCompeticao.habilitada
-                    );
-                }
-                this.#vetCompeticoes.push(competicao);
-            });
-        
-            this.#vetCompeticoes = [
-                new Maratona("Competição 1", "2023-10-10", "Local 1", 42.195, 100, 500, true),
-                new TrailRunning("Competição 2", "2023-11-15", "Local 2", 21.097, 50, "Montanhoso", "Difícil", 5, "Individual")
-            ];
-        }
+        this.#vetCompeticoes = competicoesSalvas.map(dados => {
+            const participantes = (dados.participantes ?? []).map(registro => {
+                const salvo = typeof registro === "string" ? JSON.parse(registro) : registro;
+                return this.consultarAtleta(salvo.docIdentidade);
+            }).filter(Boolean);
+            const comuns = [dados.nome, dados.local, dados.data, dados.distancia, dados.capacidade];
+            const trailRunning = dados.modalidade === "Trail Running" ||
+                (dados.modalidade == null && ("tipoTerreno" in dados || "nivelDificuldade" in dados ||
+                    "checkpoints" in dados || "tipoDisputa" in dados));
+            if (trailRunning) {
+                return new TrailRunning(...comuns, dados.tipoTerreno, dados.nivelDificuldade,
+                    dados.checkpoints, dados.tipoDisputa, [...new Set(participantes)]);
+            }
+            return new Maratona(...comuns, dados.altimetria, dados.percursoUrbano, [...new Set(participantes)]);
+        });
     }
 }
 
@@ -395,4 +380,3 @@ controller.cadastrarAtleta("Atleta 3", "1995-03-20", "Chile", ["Maratona", "Trai
 controller.cadastrarMaratona("Competição 3", "Local 3", "2023-12-20", 10, 200, 100, false); 
 controller.salvarLocalStorage();
 */
-

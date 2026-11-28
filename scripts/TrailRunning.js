@@ -6,8 +6,8 @@ export class TrailRunning extends Competicao {
     #checkpoints;
     #tipoDisputa;
 
-    constructor(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa) {
-        super(nome, local, data, distancia, capacidade);
+    constructor(nome, local, data, distancia, capacidade, tipoTerreno, nivelDificuldade, checkpoints, tipoDisputa, participantes) {
+        super(nome, local, data, distancia, capacidade, participantes);
         this.#tipoTerreno = tipoTerreno;
         this.#nivelDificuldade = nivelDificuldade;
         if (checkpoints > 0) {
@@ -60,6 +60,7 @@ export class TrailRunning extends Competicao {
     stringify() {
         return JSON.stringify({
             ...JSON.parse(super.stringify()),
+            modalidade: "Trail Running",
             tipoTerreno: this.#tipoTerreno,
             nivelDificuldade: this.#nivelDificuldade,
             checkpoints: this.#checkpoints,

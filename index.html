@@ -148,6 +148,11 @@
 
                 <form id="formNovoInscrito" hidden>
                     <div class="campo-modal-inscricao">
+                        <label for="documentoNovoInscrito">Documento de Identidade</label>
+                        <input type="text" id="documentoNovoInscrito" required>
+                    </div>
+
+                    <div class="campo-modal-inscricao">
                         <label for="nomeNovoInscrito">Nome</label>
                         <input type="text" id="nomeNovoInscrito" placeholder="Nome completo do atleta" required>
                     </div>
@@ -192,6 +197,7 @@
                 <div class="dados-perfil-atleta">
                     <dl>
                         <div><dt>Nome:</dt><dd id="nomePerfilAtleta"></dd></div>
+                        <div><dt>Documento de Identidade:</dt><dd id="documentoPerfilAtleta"></dd></div>
                         <div><dt>Data de Nascimento:</dt><dd id="nascimentoPerfilAtleta"></dd></div>
                         <div><dt>País de Origem:</dt><dd id="paisPerfilAtleta"></dd></div>
                         <div><dt>Modalidade:</dt><dd id="modalidadePerfilAtleta"></dd></div>
@@ -240,6 +246,45 @@
                     <input type="number" id="vagasCompeticao" min="1" step="1" value="40" required>
                 </div>
 
+                <div class="campo-cadastro">
+                    <label for="distanciaCompeticao">Distância (km)</label>
+                    <input type="number" id="distanciaCompeticao" min="0.001" step="any">
+                </div>
+
+                <div id="camposMaratona">
+                    <div class="campo-cadastro">
+                        <label for="altimetriaCompeticao">Altimetria (m)</label>
+                        <input type="number" id="altimetriaCompeticao" min="0" step="any">
+                    </div>
+                    <div class="campo-cadastro">
+                        <label for="percursoUrbano">Percurso Urbano</label>
+                        <select id="percursoUrbano">
+                            <option value="">Não informado</option>
+                            <option value="sim">Sim</option>
+                            <option value="nao">Não</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="camposTrailRunning" hidden>
+                    <div class="campo-cadastro">
+                        <label for="tipoTerreno">Tipo de Terreno</label>
+                        <input type="text" id="tipoTerreno" disabled>
+                    </div>
+                    <div class="campo-cadastro">
+                        <label for="nivelDificuldade">Nível de Dificuldade</label>
+                        <input type="text" id="nivelDificuldade" disabled>
+                    </div>
+                    <div class="campo-cadastro">
+                        <label for="checkpointsCompeticao">Checkpoints</label>
+                        <input type="number" id="checkpointsCompeticao" min="1" step="1" disabled>
+                    </div>
+                    <div class="campo-cadastro">
+                        <label for="tipoDisputa">Tipo de Disputa</label>
+                        <input type="text" id="tipoDisputa" disabled>
+                    </div>
+                </div>
+
                 <button type="submit" id="btnTerminar" class="btn-terminar">Terminar</button>
                 <p id="erroCadastro" class="erro-cadastro" role="alert"></p>
             </form>
@@ -257,6 +302,11 @@
                 </div>
 
                 <div class="campo-cadastro">
+                    <label for="documentoAtleta">Documento de Identidade</label>
+                    <input type="text" id="documentoAtleta" required>
+                </div>
+
+                <div class="campo-cadastro">
                     <label for="nascimentoAtleta">Data de Nascimento</label>
                     <input type="date" id="nascimentoAtleta" required>
                 </div>
@@ -267,7 +317,7 @@
                 </div>
 
                 <div class="campo-cadastro">
-                    <label for="modalidadeAtleta">Modalidade</label>
+                    <label for="modalidadeAtleta" id="rotuloModalidadeAtleta">Modalidade</label>
                     <select id="modalidadeAtleta" required></select>
                 </div>
 
